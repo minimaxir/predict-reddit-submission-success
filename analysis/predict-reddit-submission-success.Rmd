@@ -39,7 +39,7 @@ df_hours <- read_delim("hours_embeddings.txt", col_names = F, delim=" ", quote =
 df_minutes <- read_delim("minutes_embeddings.txt", col_names = F, delim=" ", quote = "—")
 ```
 
-## Plot Model Training
+# Plot Model Training
 
 ```{r}
 # Test Accuracy must be better than this.
@@ -78,7 +78,7 @@ ggsave("predict-reddit-1.png", plot, width=4, height=3)
 
 ![](predict-reddit-1.png)
 
-## Plot Embeddings
+# Plot Embeddings
 
 ## Day of Week
 
@@ -89,18 +89,21 @@ max_iter = 500
 
 set.seed(123)
 
+labels = c("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+
 df_dayofweeks_tf <- df_dayofweeks %>% select(X2:X65)%>%
                   data.matrix() %>%
                   tsne(perplexity = perplexity, initial_dims = initial_dims, max_iter = max_iter)
 
-df_dayofweeks_tf <- data.frame(dayofweek = c("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"), df_dayofweeks_tf) %>%
-                    tbl_df()
+df_dayofweeks_tf <- data.frame(labels, df_dayofweeks_tf) %>%
+                    tbl_df() %>%
+                    mutate(labels = factor(labels, levels=labels))
 
 df_dayofweeks_tf
 ```
 
 ```{r}
-plot <- ggplot(df_dayofweeks_tf, aes(x=X1, y=X2, label=dayofweek, color =dayofweek)) +
+plot <- ggplot(df_dayofweeks_tf, aes(x=X1, y=X2, label=labels, color =labels)) +
           geom_text(family="Source Code Pro Semibold") +
           theme_void(base_family = "Source Sans Pro", base_size=8) +
           scale_color_viridis(discrete=T, guide=FALSE) + 
@@ -113,6 +116,8 @@ plot <- ggplot(df_dayofweeks_tf, aes(x=X1, y=X2, label=dayofweek, color =dayofwe
           
 ggsave("predict-reddit-2.png", plot, width=4, height=3)
 ```
+
+![](predict-reddit-2.png)
 
 ## Day of Year
 
@@ -130,7 +135,8 @@ df_dayofyears_tf <- df_dayofyears[1:120,] %>% select(X2:X65)%>%
                   tsne(perplexity = perplexity, initial_dims = initial_dims, max_iter = max_iter)
 
 df_dayofyears_tf <- data.frame(labels, df_dayofyears_tf) %>%
-                    tbl_df()
+                    tbl_df() %>%
+                    mutate(labels = factor(labels, levels=labels))
 
 df_dayofyears_tf
 ```
@@ -154,3 +160,94 @@ plot <- ggplot(df_dayofyears_tf, aes(x=X1, y=X2, label=labels, color = labels)) 
           
 ggsave("predict-reddit-3.png", plot, width=4, height=3)
 ```
+
+![](predict-reddit-3.png)
+
+## Hours
+
+```{r}
+perplexity = 3
+initial_dims = 64
+max_iter = 500
+
+set.seed(123)
+
+labels <- c("12AM", paste0(1:11,"AM"), "12PM", paste0(1:11,"PM"))
+
+df_hours_tf <- df_hours %>% select(X2:X65)%>%
+                  data.matrix() %>%
+                  tsne(perplexity = perplexity, initial_dims = initial_dims, max_iter = max_iter)
+
+df_hours_tf <- data.frame(labels, df_hours_tf) %>%
+                    tbl_df() %>%
+                    mutate(labels = factor(labels, levels=labels))
+
+df_hours_tf
+```
+
+
+```{r}
+xscale = 200
+yscale = 200
+
+plot <- ggplot(df_hours_tf, aes(x=X1, y=X2, label=labels, color = labels)) +
+          geom_text(family="Source Code Pro Semibold", size=4) +
+          theme_void(base_family = "Source Sans Pro", base_size=8) +
+          scale_color_viridis(discrete=T, guide=FALSE) + 
+          #scale_x_continuous(limits=c(-xscale, xscale)) +
+          #scale_y_continuous(limits=c(-yscale, yscale)) +
+          labs(title = "2D Projection of Hour (EST) Vectors in Reddit Prediction Model",
+               subtitle = "Labels closer to each other are more similar in context.",
+               caption = "Max Woolf — minimaxir.com") +
+          theme(plot.margin = unit(c(0.2,0.2,0.2,0.2),"cm"),
+                plot.caption = element_text(size=6, color="#969696"))
+          
+ggsave("predict-reddit-4.png", plot, width=4, height=3)
+```
+
+![](predict-reddit-4.png)
+
+## Minutes
+
+```{r}
+perplexity = 10
+initial_dims = 32
+max_iter = 500
+
+set.seed(123)
+
+labels <- sprintf("%02s", 0:59)
+
+df_minutes_tf <- df_minutes %>% select(X2:X65)%>%
+                  data.matrix() %>%
+                  tsne(perplexity = perplexity, initial_dims = initial_dims, max_iter = max_iter)
+
+df_minutes_tf <- data.frame(labels, df_minutes_tf) %>%
+                    tbl_df() %>%
+                    mutate(labels = factor(labels, levels=labels))
+
+df_minutes_tf
+```
+
+
+```{r}
+xscale = 200
+yscale = 200
+
+plot <- ggplot(df_minutes_tf, aes(x=X1, y=X2, label=labels, color = labels)) +
+          geom_text(family="Source Code Pro Semibold", size=4) +
+          theme_void(base_family = "Source Sans Pro", base_size=8) +
+          scale_color_viridis(discrete=T, guide=FALSE) + 
+          #scale_x_continuous(limits=c(-xscale, xscale)) +
+          #scale_y_continuous(limits=c(-yscale, yscale)) +
+          labs(title = "2D Projection of Minute Vectors in Reddit Prediction Model",
+               subtitle = "Labels closer to each other are more similar in context.",
+               caption = "Max Woolf — minimaxir.com") +
+          theme(plot.margin = unit(c(0.2,0.2,0.2,0.2),"cm"),
+                plot.caption = element_text(size=6, color="#969696"))
+          
+ggsave("predict-reddit-5.png", plot, width=4, height=3)
+```
+
+
+![](predict-reddit-5.png)
