@@ -117,8 +117,8 @@ ggsave("predict-reddit-2.png", plot, width=4, height=3)
 ## Day of Year
 
 ```{r}
-perplexity = 20
-initial_dims = 16
+perplexity = 30
+initial_dims = 64
 max_iter = 1000
 
 set.seed(123)
