@@ -2,6 +2,8 @@
 
 Repository w/ Jupyter + R Notebooks for creating a model to predict the success of Reddit submissions with Keras.
 
+The data visualizations, including 2D embeddings, are available in the `/analysis` folder.
+
 ## Maintainer
 
 Max Woolf ([@minimaxir](http://minimaxir.com))
